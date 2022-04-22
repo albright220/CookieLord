@@ -39,16 +39,22 @@ namespace CookieLord
             // Check for artisan beer in inventory
             var itemRoster = MobileParty.MainParty.ItemRoster;
             var artisanBeerObject = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
+            var ma = Mission.MainAgent;
+
             if (itemRoster.GetItemNumber(artisanBeerObject) <= 0) return;
 
             // Remove one artisan beer
             itemRoster.AddToCounts(artisanBeerObject, -1);
 
+            // Check that player hp is not at the limit
+            
             // Increase player hp
-            Mission.MainAgent.Health += 20;
-            InformationManager.DisplayMessage(new InformationMessage(
-                String.Format("Health increased by {0}, now at {1}", 20, Mission.MainAgent.Health)
-                ));
+            ma.Health += 20;
+
+            // Display Message
+            var dm = new DisplayMessages();
+            var mesArgs = new object[] { 20, ma.Health };
+            dm.ShowMessage(dm.CreateFormattedInfoMessage("Gained {0} Health. Health at {1}", mesArgs));
         }
     }
 }
