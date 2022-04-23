@@ -30,7 +30,11 @@ namespace CookieLord
 
             if (Input.IsKeyPressed(TaleWorlds.InputSystem.InputKey.Q)) 
             {
-                DrinkBeer();
+                if (Mission.Mode is MissionMode.Battle or MissionMode.Stealth or MissionMode.Duel or MissionMode.Tournament)
+                {
+                    DrinkBeer();
+                }
+                else return;
             }
         }
 
@@ -50,7 +54,7 @@ namespace CookieLord
             // Check for player health at limit
             if (ma.Health >= ma.HealthLimit)
             {
-                dm.ShowMessage(dm.CreateBasicInfoMessage("Health is full; cannot use Artisan Beer"));
+                dm.ShowMessage(dm.CreateBasicInfoMessage("Health is full, cannot use Artisan Beer"));
                 return;
             }
 
@@ -73,7 +77,7 @@ namespace CookieLord
 
             // Display Health Message
             var mesArgs = new object[] { healthAdded, ma.Health };
-            dm.ShowMessage(dm.CreateFormattedInfoMessage("Gained {0} Health. Health at {1}", mesArgs));
+            dm.ShowMessage(dm.CreateFormattedInfoMessage("Healed {0} hp. Currently at {1}hp", mesArgs));
         }
     }
 }
