@@ -8,7 +8,7 @@ using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Core;
 
-namespace CookieLord
+namespace ArtisanBeer
 {
     public class ArtisanBeerBehavior : CampaignBehaviorBase
     {

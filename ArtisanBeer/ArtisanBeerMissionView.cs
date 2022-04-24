@@ -4,7 +4,7 @@ using TaleWorlds.MountAndBlade;
 using TaleWorlds.MountAndBlade.View.Missions;
 using TaleWorlds.ObjectSystem;
 
-namespace CookieLord
+namespace ArtisanBeer
 {
     public class ArtisanBeerMissionView : MissionView 
     {

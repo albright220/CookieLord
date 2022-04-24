@@ -1,7 +1,7 @@
 ﻿using System;
 using TaleWorlds.Core;
 
-namespace CookieLord
+namespace ArtisanBeer
 {
     public class DisplayMessages
     {

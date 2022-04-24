@@ -3,7 +3,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 
-namespace CookieLord
+namespace ArtisanBeer
 {
     public class SubModule : MBSubModuleBase
     {
