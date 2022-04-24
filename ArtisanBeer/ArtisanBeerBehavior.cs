@@ -21,7 +21,7 @@ namespace ArtisanBeer
             CampaignEvents.OnWorkshopChangedEvent.AddNonSerializedListener(this, OnWorkshopChangedEvent);
             CampaignEvents.DailyTickTownEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent
-                .AddNonSerializedListener(this,LocationCharactersAreReadyToSpawn);
+                .AddNonSerializedListener(this, LocationCharactersAreReadyToSpawn);
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
         }
         ItemObject _artisanBeer;
@@ -60,7 +60,8 @@ namespace ArtisanBeer
                     () => CharacterObject.OneToOneConversationCharacter == _artisanBrewer, null);
 
                 // Buy beer conversation tree
-                starter.AddPlayerLine("artisan_brewer_buy", "artisan_brewer", "artisan_brewer_purchased", "Of course! Here's 200 denars", null, () => {
+                starter.AddPlayerLine("artisan_brewer_buy", "artisan_brewer", "artisan_brewer_purchased", "Of course! Here's 200 denars", null, () =>
+                {
                     // Replace '200' with artisan_beer_price once we implement it as an object
                     GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, 200, false);
                     MobileParty.MainParty.ItemRoster.AddToCounts(_artisanBeer, 1);
@@ -70,7 +71,8 @@ namespace ArtisanBeer
                     {
                         explanation = new TextObject("Not enough denars.");
                         return false;
-                    } else
+                    }
+                    else
                     {
                         explanation = TextObject.Empty;
                         return true;
@@ -98,13 +100,28 @@ namespace ArtisanBeer
                     unusedUsablePointCount.TryGetValue(workshop.Tag, out num);
                     if (num > 0f)
                     {
+                        string actionSetCode = "as_human_villager_drinker_with_mug";
+                        string value = "artisan_beer_drink_animation";
+
+                        AgentData agentData = new AgentData(new SimpleAgentOrigin(_artisanBrewer)).Monster(Campaign.Current.HumanMonsterSettlement);
                         LocationCharacter locationCharacter = new LocationCharacter(
-                            new AgentData(new SimpleAgentOrigin(_artisanBrewer)).Monster(Campaign.Current.HumanMonsterSettlement), 
-                            new LocationCharacter.AddBehaviorsDelegate(SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors), 
-                            workshop.Tag, true, LocationCharacter.CharacterRelations.Neutral, null, true, false, null, false, false, true);
+                            agentData,
+                            new LocationCharacter.AddBehaviorsDelegate(SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors),
+                            workshop.Tag, true, LocationCharacter.CharacterRelations.Neutral, actionSetCode, true, false, null, false, false, true)
+                        {
+                            PrefabNamesForBones =
+                            {
+                                {
+                                    agentData.AgentMonster.MainHandItemBoneIndex,
+                                    value
+                                }
+                            }
+                        };
+
+
                         locationWithId.AddCharacter(locationCharacter);
                     }
-                 }
+                }
             }
         }
 
@@ -121,12 +138,12 @@ namespace ArtisanBeer
 
         private void OnWorkshopChangedEvent(Workshop workshop, Hero hero, WorkshopType type)
         {
-            
+
         }
 
         public override void SyncData(IDataStore dataStore)
         {
-            
+
         }
     }
 }
