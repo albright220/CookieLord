@@ -25,10 +25,12 @@ namespace ArtisanBeer
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
         }
         ItemObject _artisanBeer;
+        CharacterObject _artisanBrewer;
 
         private void OnSessionLaunched(CampaignGameStarter starter)
         {
             _artisanBeer = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
+            _artisanBrewer = MBObjectManager.Instance.GetObject<CharacterObject>("artisan_brewer");
             AddDialogs(starter);
         }
 
@@ -55,7 +57,7 @@ namespace ArtisanBeer
             // Artisan Beer Brewer conversation
             {
                 starter.AddDialogLine("artisan_brewer_talk", "start", "artisan_brewer", "You here for the good stuff?",
-                    () => CharacterObject.OneToOneConversationCharacter == Settlement.CurrentSettlement.Culture.CaravanMaster, null);
+                    () => CharacterObject.OneToOneConversationCharacter == _artisanBrewer, null);
 
                 // Buy beer conversation tree
                 starter.AddPlayerLine("artisan_brewer_buy", "artisan_brewer", "artisan_brewer_purchased", "Of course! Here's 200 denars", null, () => {
@@ -96,9 +98,8 @@ namespace ArtisanBeer
                     unusedUsablePointCount.TryGetValue(workshop.Tag, out num);
                     if (num > 0f)
                     {
-                        CharacterObject caravanMaster = Settlement.CurrentSettlement.Culture.CaravanMaster;
                         LocationCharacter locationCharacter = new LocationCharacter(
-                            new AgentData(new SimpleAgentOrigin(caravanMaster)).Monster(Campaign.Current.HumanMonsterSettlement), 
+                            new AgentData(new SimpleAgentOrigin(_artisanBrewer)).Monster(Campaign.Current.HumanMonsterSettlement), 
                             new LocationCharacter.AddBehaviorsDelegate(SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors), 
                             workshop.Tag, true, LocationCharacter.CharacterRelations.Neutral, null, true, false, null, false, false, true);
                         locationWithId.AddCharacter(locationCharacter);
