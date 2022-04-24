@@ -18,7 +18,30 @@ namespace ArtisanBeer
             CampaignEvents.DailyTickTownEvent.AddNonSerializedListener(this, DailyTick);
             CampaignEvents.LocationCharactersAreReadyToSpawnEvent
                 .AddNonSerializedListener(this,LocationCharactersAreReadyToSpawn);
+            CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
+        }
 
+        private void OnSessionLaunched(CampaignGameStarter starter)
+        {
+            AddDialogs(starter);
+        }
+
+        private void AddDialogs(CampaignGameStarter starter)
+        {
+            starter.AddPlayerLine("tavernkeeper_talk_ask_artisan_beer",
+                "tavernkeeper_talk", "tavernkeeper_artisan_beer", "Do you have any Artisan Beer?", null, null);
+            starter.AddDialogLine("tavernkeeper_talk_artisan_beer_a",
+                "tavernkeeper_artisan_beer", "tavernkeeper_talk", "Sorry, I don't sell the good stuff to just anyone. Best head to the brewery if you want to get your hands on it.", () =>
+                {
+                    foreach (var workshop in Settlement.CurrentSettlement.Town.Workshops)
+                    {
+                        if (workshop.WorkshopType.StringId == "brewer") return true;
+                    }
+                    return false;
+                },
+                null);
+            starter.AddDialogLine("tavernkeeper_talk_artisan_beer_b",
+                "tavernkeeper_artisan_beer", "tavernkeeper_talk", $"Sorry, you'll have to look elsewhere. There's no brewery in {Settlement.CurrentSettlement.Name}, and without a local supplier I can't get my hands on the good stuff.", null, null);
         }
 
         private void LocationCharactersAreReadyToSpawn(Dictionary<string, int> unusedUsablePointCount)
