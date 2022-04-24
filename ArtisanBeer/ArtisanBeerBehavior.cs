@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.AgentOrigins;
 using TaleWorlds.CampaignSystem.Encounters;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.CampaignSystem.Settlements.Workshops;
 using TaleWorlds.Core;
+using TaleWorlds.Localization;
+using TaleWorlds.ObjectSystem;
 
 namespace ArtisanBeer
 {
@@ -20,28 +24,62 @@ namespace ArtisanBeer
                 .AddNonSerializedListener(this,LocationCharactersAreReadyToSpawn);
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, OnSessionLaunched);
         }
+        ItemObject _artisanBeer;
 
         private void OnSessionLaunched(CampaignGameStarter starter)
         {
+            _artisanBeer = MBObjectManager.Instance.GetObject<ItemObject>("artisan_beer");
             AddDialogs(starter);
         }
 
         private void AddDialogs(CampaignGameStarter starter)
         {
-            starter.AddPlayerLine("tavernkeeper_talk_ask_artisan_beer",
+            // Artisan Beer Tavernkeep conversation
+            {
+                starter.AddPlayerLine("tavernkeeper_talk_ask_artisan_beer",
                 "tavernkeeper_talk", "tavernkeeper_artisan_beer", "Do you have any Artisan Beer?", null, null);
-            starter.AddDialogLine("tavernkeeper_talk_artisan_beer_a",
-                "tavernkeeper_artisan_beer", "tavernkeeper_talk", "Sorry, I don't sell the good stuff to just anyone. Best head to the brewery if you want to get your hands on it.", () =>
-                {
-                    foreach (var workshop in Settlement.CurrentSettlement.Town.Workshops)
+                starter.AddDialogLine("tavernkeeper_talk_artisan_beer_a",
+                    "tavernkeeper_artisan_beer", "tavernkeeper_talk", "Sorry, I don't sell the good stuff to just anyone. Best head to the brewery if you want to get your hands on it.", () =>
                     {
-                        if (workshop.WorkshopType.StringId == "brewer") return true;
+                        foreach (var workshop in Settlement.CurrentSettlement.Town.Workshops)
+                        {
+                            if (workshop.WorkshopType.StringId == "brewer") return true;
+                        }
+                        return false;
+                    },
+                    null);
+                starter.AddDialogLine("tavernkeeper_talk_artisan_beer_b",
+                    "tavernkeeper_artisan_beer", "tavernkeeper_talk", "Sorry, you'll have to look elsewhere. There's no brewery here, and without a local supplier I can't get my hands on the good stuff.", null, null);
+            }
+
+            // Artisan Beer Brewer conversation
+            {
+                starter.AddDialogLine("artisan_brewer_talk", "start", "artisan_brewer", "You here for the good stuff?",
+                    () => CharacterObject.OneToOneConversationCharacter == Settlement.CurrentSettlement.Culture.CaravanMaster, null);
+
+                // Buy beer conversation tree
+                starter.AddPlayerLine("artisan_brewer_buy", "artisan_brewer", "artisan_brewer_purchased", "Of course!", null, () => {
+                    // Replace '200' with artisan_beer_price once we implement it as an object
+                    GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, 200, false);
+                    MobileParty.MainParty.ItemRoster.AddToCounts(_artisanBeer, 1);
+                }, 100, (out TextObject explanation) =>
+                {
+                    if (Hero.MainHero.Gold < 200)
+                    {
+                        explanation = new TextObject("Not enough Denars.");
+                        return false;
+                    } else
+                    {
+                        explanation = TextObject.Empty;
+                        return true;
                     }
-                    return false;
-                },
-                null);
-            starter.AddDialogLine("tavernkeeper_talk_artisan_beer_b",
-                "tavernkeeper_artisan_beer", "tavernkeeper_talk", $"Sorry, you'll have to look elsewhere. There's no brewery in {Settlement.CurrentSettlement.Name}, and without a local supplier I can't get my hands on the good stuff.", null, null);
+                });
+                starter.AddDialogLine("artisan_brewer_beer_sold", "artisan_brewer_purchased", "end", "Hehehe, I could tell just by lookin' at ya. Here you go, one artisan beer.", null, null);
+
+                // Decline beer conversation tree
+                starter.AddPlayerLine("artisan_brewer_refuse", "artisan_brewer", "artisan_brewer_declined", "...what?", null, null);
+                starter.AddDialogLine("artisan_brewer_not_sold", "artisan_brewer_declined", "end", "Tch. Beat it kid.", null, null);
+            }
         }
 
         private void LocationCharactersAreReadyToSpawn(Dictionary<string, int> unusedUsablePointCount)
