@@ -58,7 +58,7 @@ namespace ArtisanBeer
                     () => CharacterObject.OneToOneConversationCharacter == Settlement.CurrentSettlement.Culture.CaravanMaster, null);
 
                 // Buy beer conversation tree
-                starter.AddPlayerLine("artisan_brewer_buy", "artisan_brewer", "artisan_brewer_purchased", "Of course!", null, () => {
+                starter.AddPlayerLine("artisan_brewer_buy", "artisan_brewer", "artisan_brewer_purchased", "Of course! Here's 200 denars", null, () => {
                     // Replace '200' with artisan_beer_price once we implement it as an object
                     GiveGoldAction.ApplyBetweenCharacters(Hero.MainHero, null, 200, false);
                     MobileParty.MainParty.ItemRoster.AddToCounts(_artisanBeer, 1);
@@ -66,7 +66,7 @@ namespace ArtisanBeer
                 {
                     if (Hero.MainHero.Gold < 200)
                     {
-                        explanation = new TextObject("Not enough Denars.");
+                        explanation = new TextObject("Not enough denars.");
                         return false;
                     } else
                     {
