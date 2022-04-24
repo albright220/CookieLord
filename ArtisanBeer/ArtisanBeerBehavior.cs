@@ -106,7 +106,7 @@ namespace ArtisanBeer
                         AgentData agentData = new AgentData(new SimpleAgentOrigin(_artisanBrewer)).Monster(Campaign.Current.HumanMonsterSettlement);
                         LocationCharacter locationCharacter = new LocationCharacter(
                             agentData,
-                            new LocationCharacter.AddBehaviorsDelegate(SandBoxManager.Instance.AgentBehaviorManager.AddWandererBehaviors),
+                            new LocationCharacter.AddBehaviorsDelegate(SandBoxManager.Instance.AgentBehaviorManager.AddFixedCharacterBehaviors),
                             workshop.Tag, true, LocationCharacter.CharacterRelations.Neutral, actionSetCode, true, false, null, false, false, true)
                         {
                             PrefabNamesForBones =
